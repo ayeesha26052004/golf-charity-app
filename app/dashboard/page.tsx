@@ -45,39 +45,30 @@ export default function Dashboard() {
   const addScore = async () => {
     if (!user) return
 
-    const numericScore = parseInt(score)
+    const num = parseInt(score)
 
-    if (numericScore < 1 || numericScore > 45) {
-      alert('Score must be between 1 and 45')
+    if (num < 1 || num > 45) {
+      alert('Enter value between 1–45')
       return
     }
 
-    // Keep only last 5 scores
     if (scores.length >= 5) {
       const oldest = scores[scores.length - 1]
       await supabase.from('scores').delete().eq('id', oldest.id)
     }
 
     await supabase.from('scores').insert([
-      {
-        user_id: user.id,
-        score: numericScore,
-      },
+      { user_id: user.id, score: num },
     ])
 
     setScore('')
     fetchScores(user.id)
   }
 
-  // 🎯 DRAW FUNCTION
   const runDraw = async () => {
-    console.log("RUN DRAW CLICKED")
-
     const drawNumbers = Array.from({ length: 5 }, () =>
       Math.floor(Math.random() * 45) + 1
     )
-
-    console.log('Draw Numbers:', drawNumbers)
 
     const { data: drawData } = await supabase
       .from('draws')
@@ -100,12 +91,7 @@ export default function Dashboard() {
         drawNumbers.includes(s)
       ).length
 
-      console.log('User:', u.email)
-      console.log('User Scores:', userScores)
-      console.log('Matches:', matches)
-
-      // TEMP: change to >=1 for testing, then back to >=3
-      if (matches >= 1) {
+      if (matches >= 3) {
         await supabase.from('winners').insert([
           {
             user_id: u.id,
@@ -117,54 +103,45 @@ export default function Dashboard() {
       }
     }
 
-    alert('Draw completed 🎯')
     fetchWinners()
+    alert('Draw completed 🎯')
   }
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Dashboard 🎯</h1>
 
-      {user && <p>Welcome: {user.email}</p>}
+      {user && <p>{user.email}</p>}
 
       <hr />
 
-      {/* SCORE SECTION */}
       <h2>Add Score</h2>
-
       <input
         type="number"
-        placeholder="Enter score (1-45)"
         value={score}
         onChange={(e) => setScore(e.target.value)}
       />
       <button onClick={addScore}>Add</button>
 
       <h3>Your Scores</h3>
-
       <ul>
         {scores.map((s) => (
-          <li key={s.id}>
-            {s.score} ({new Date(s.created_at).toLocaleString()})
-          </li>
+          <li key={s.id}>{s.score}</li>
         ))}
       </ul>
 
       <hr />
 
-      {/* DRAW SECTION */}
       <h2>Run Draw</h2>
       <button onClick={runDraw}>Run Draw</button>
 
       <hr />
 
-      {/* WINNERS SECTION */}
       <h2>🏆 Winners</h2>
-
       <ul>
         {winners.map((w) => (
           <li key={w.id}>
-            Match: {w.match_count} | Prize: ₹{w.prize}
+            Match: {w.match_count} | ₹{w.prize}
           </li>
         ))}
       </ul>

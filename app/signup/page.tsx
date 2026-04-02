@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
-export default function Login() {
+export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
 
-  const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithPassword({
+  const handleSignup = async () => {
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     })
@@ -18,13 +18,14 @@ export default function Login() {
     if (error) {
       alert(error.message)
     } else {
-      router.push('/dashboard')
+      alert('Signup successful! Please login.')
+      router.push('/login')
     }
   }
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Login</h1>
+      <h1>Signup</h1>
 
       <input
         type="email"
@@ -38,10 +39,10 @@ export default function Login() {
         onChange={(e) => setPassword(e.target.value)}
       /><br /><br />
 
-      <button onClick={handleLogin}>Login</button>
+      <button onClick={handleSignup}>Sign Up</button>
 
       <p>
-        Don’t have an account? <a href="/signup">Sign up</a>
+        Already have an account? <a href="/login">Login</a>
       </p>
     </div>
   )
