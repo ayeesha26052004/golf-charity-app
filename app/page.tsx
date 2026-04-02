@@ -1,13 +1,25 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
-export default async function Home() {
-  const { data, error } = await supabase.from('users').select('*')
+export default function Home() {
+  const router = useRouter()
 
-  console.log(data, error)
+  useEffect(() => {
+    checkUser()
+  }, [])
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>Supabase Connected ✅</h1>
-    </div>
-  )
+  const checkUser = async () => {
+    const { data } = await supabase.auth.getUser()
+
+    if (data.user) {
+      router.push('/dashboard')
+    } else {
+      router.push('/login')
+    }
+  }
+
+  return <p>Loading...</p>
 }
