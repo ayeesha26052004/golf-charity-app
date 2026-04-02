@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
-export default function Signup() {
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
 
-  const handleSignup = async () => {
-    const { data, error } = await supabase.auth.signUp({
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -16,40 +18,31 @@ export default function Signup() {
     if (error) {
       alert(error.message)
     } else {
-      const user = data.user
-
-      if (user) {
-        await supabase.from('users').insert([
-          {
-            id: user.id,
-            email: user.email,
-          },
-        ])
-      }
-
-      alert('Signup successful ✅')
+      router.push('/dashboard')
     }
   }
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Signup</h2>
+      <h1>Login</h1>
 
       <input
         type="email"
         placeholder="Email"
         onChange={(e) => setEmail(e.target.value)}
-      />
-      <br /><br />
+      /><br /><br />
 
       <input
         type="password"
         placeholder="Password"
         onChange={(e) => setPassword(e.target.value)}
-      />
-      <br /><br />
+      /><br /><br />
 
-      <button onClick={handleSignup}>Signup</button>
+      <button onClick={handleLogin}>Login</button>
+
+      <p>
+        Don’t have an account? <a href="/signup">Sign up</a>
+      </p>
     </div>
   )
 }
